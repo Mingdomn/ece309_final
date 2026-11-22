@@ -10,7 +10,16 @@ ToolRegistry::ToolRegistry(): num_buckets(16), num_keys(0), max_chain_len(0) {
 }
 
 ToolRegistry::~ToolRegistry() {
-	/* unique pointers free the tools. */
+	for (std::size_t i = 0; i < bucket_count(); i++) {
+		if (buckets[i].tool == nullptr)
+			continue;
+
+		for (Bucket *b = buckets[i].next, *next; b != nullptr; b = next) {
+			next = b->next;
+			delete b;
+		}
+	}
+
 	delete[] buckets;
 }
 
@@ -27,7 +36,7 @@ std::size_t ToolRegistry::hash(std::string_view key) noexcept {
 }
 
 bool ToolRegistry::add(std::unique_ptr<Tool> tool) {
-	std::size_t index, chain_len = 0;
+	std::size_t index, chain_len = 1;
 	Bucket *b;
 
 	if (tool == nullptr)
@@ -53,11 +62,18 @@ bool ToolRegistry::add(std::unique_ptr<Tool> tool) {
 			if (buckets_old[i].tool == nullptr)
 				continue;
 
-			for (b = &buckets_old[i]; b != nullptr;
-			    b = b->next) {
+			add(std::move(buckets_old[i].tool));
+			for (b = buckets_old[i].next; b != nullptr;) {
+				Bucket *tmp = b->next;
+
 				add(std::move(b->tool));
+
+				delete b;
+				b = tmp;
 			}
 		}
+
+		delete[] buckets_old;
 	}
 
 	num_keys++;

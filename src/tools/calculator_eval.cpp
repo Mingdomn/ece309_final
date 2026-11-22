@@ -6,6 +6,7 @@
 
 #include "tools/calculator.h"
 
+#include <cstdint>
 #include <iostream>
 bool calc_evaluate(const std::vector<CalcToken>& tokens, double* out,
                    std::string* error) {
@@ -64,6 +65,8 @@ bool calc_evaluate(const std::vector<CalcToken>& tokens, double* out,
 				break;
 			default:
 				*error = "Invalid token in operator stack";
+				delete[] op_stack;
+				delete[] out_stack;
 				return false;
 			}
 
@@ -113,6 +116,8 @@ bool calc_evaluate(const std::vector<CalcToken>& tokens, double* out,
 
 			if (ans_stack[ans_len] == 0) {
 				*error = "division by zero";
+				delete[] ans_stack;
+				delete[] out_stack;
 				return false;
 			}
 
@@ -121,6 +126,8 @@ bool calc_evaluate(const std::vector<CalcToken>& tokens, double* out,
 			break;
 		default:
 			*error = "Invalid token in output stack";
+			delete[] ans_stack;
+			delete[] out_stack;
 			return false;
 		}
 	}
