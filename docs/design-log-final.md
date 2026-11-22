@@ -1,6 +1,6 @@
 # Final Project Design Log
-**Author:** <your name> · **P2 code used:** <my own | instructor reference> · **P3 code used:** <my own | instructor reference>
-**Tools used:** <AI assistants / other tools, and what you used them for>
+**Author:** Ahmad Khalifa · **P2 code used:** instructor reference · **P3 code used:** instructor reference
+**Tools used:** Used Claude to look through the finalized project for bugs. All code was written by me with no AI influence.
 
 <!-- 700–1,000 words. An argument, not a diary: say what you decided, what
      you rejected, and what evidence backs it up. Paste the numbers your
