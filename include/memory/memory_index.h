@@ -83,4 +83,14 @@ private:
 
     Node*       root_ = nullptr;
     std::size_t count_ = 0;
+
+    /*
+     * Internal helper.
+     * Return (parent, node).
+     * node is nullptr if it isn't found, and parent is where the walk stopped.
+     */
+    std::pair<Node *, Node *> find_internal(std::uint64_t id) const;
+
+    static std::size_t height_of(const Node *n);
+    void for_each_in_order_recursive(Node *n, const std::function<void(const MemoryRecord&)>& fn) const;
 };

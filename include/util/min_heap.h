@@ -33,29 +33,41 @@ public:
 
     // Adds value. O(log n).
     void push(T value) {
-        // TODO: append to data_, then sift the new element up.
+        // append to data_, then sift the new element up.
         // Clue: compare with less_(a, b), never a < b. Some element types
         // (e.g. the provided memory_store.cpp's Scored struct) have no
         // operator<, and a min-heap of std::greater must still work.
-        (void)value;
+	data_.push_back(std::move(value));
+	sift_up(data_.size() - 1);
     }
 
     // The smallest element. Throws std::out_of_range if empty. O(1).
     const T& top() const {
-        // TODO
-        throw std::out_of_range("MinHeap::top not implemented");
+	if (data_.empty())
+        	throw std::out_of_range("heap is empty");
+	return data_[0];
     }
 
     // Removes and returns the smallest element. Throws std::out_of_range if
     // empty. O(log n).
     T pop() {
-        // TODO: save the root, move the last element to the root, shrink,
+        // save the root, move the last element to the root, shrink,
         // sift down, return the saved root.
         // Clue: check empty() first. With one element, there is no "last
         // element" to move: just take it and pop_back().
         // Clue: T result = std::move(data_[0]); then move the last element
         // into slot 0 (moving avoids copying big strings).
-        throw std::out_of_range("MinHeap::pop not implemented");
+
+	if (data_.empty())
+		throw std::out_of_range("heap is empty");
+
+	T root = std::move(data_[0]);
+
+	data_[0] = std::move(data_.back());
+	data_.pop_back();
+	sift_down(0);
+
+	return root;
     }
 
     std::size_t size() const noexcept { return data_.size(); }
@@ -74,6 +86,50 @@ private:
 
     std::vector<T> data_;
     Less           less_;
+
+    inline std::size_t parent(std::size_t i) {
+	    return (i - 1) / 2;
+    }
+
+    inline std::size_t child1(std::size_t i) {
+	    return 2 * i + 1;
+    }
+
+    inline std::size_t child2(std::size_t i) {
+	    return 2 * i + 2;
+    }
+
+    void sift_up(std::size_t i) {
+	    while (i > 0) {
+		    const std::size_t p = parent(i);
+
+		    if (less_(data_[p], data_[i]))
+			    break;
+
+		    std::swap(data_[p], data_[i]);
+		    i = p;
+	    }
+    }
+
+    void sift_down(std::size_t i) {
+	    while (i < data_.size()) {
+	    	const std::size_t c1 = child1(i), c2 = child2(i);
+		std::size_t min;
+
+		if (c1 >= data_.size())
+			break;
+		else if (c2 >= data_.size())
+			min = c1;
+		else
+			min = less_(data_[c1], data_[c2]) ? c1 : c2;
+
+		if (less_(data_[i], data_[min]))
+			break;
+
+		std::swap(data_[i], data_[min]);
+		i = min;
+	    }
+    }
 };
 
 // Returns the k LARGEST items of `items` (by `less`), largest first.
@@ -84,7 +140,7 @@ private:
 // space. Items that compare equal may come out in any order.
 template <typename T, typename Less = std::less<T>>
 std::vector<T> top_k(const std::vector<T>& items, std::size_t k, Less less = Less()) {
-    // TODO: keep a MinHeap<T, Less> of at most k items. For each item: if
+    // keep a MinHeap<T, Less> of at most k items. For each item: if
     // the heap has fewer than k items, push it; otherwise, if the heap's top
     // is less than the item, pop the top and push the item. At the end, pop
     // everything (smallest first) and return it reversed.
@@ -98,8 +154,28 @@ std::vector<T> top_k(const std::vector<T>& items, std::size_t k, Less less = Les
     //    heap.top() < item.  Read less(a, b) as "a is WORSE than b": the heap
     //    keeps the k best items with the worst of them on top.
     //  * std::reverse (from <algorithm>) flips a vector.
-    (void)items;
-    (void)k;
-    (void)less;
-    return {};
+    MinHeap<T, Less> heap(less);
+    std::vector<T> ret;
+
+    if (k == 0)
+	    return ret;
+    else if (k > items.size())
+	    k = items.size();
+
+    for (std::size_t i = 0; i < k; i++)
+	    heap.push(items[i]);
+
+    for (std::size_t i = k; i < items.size(); i++) {
+	    if (!less(heap.top(), items[i]))
+		    continue;
+
+	    heap.pop();
+	    heap.push(items[i]);
+    }
+
+    while (!heap.empty())
+	    ret.push_back(heap.pop());
+
+    std::reverse(ret.begin(), ret.end());
+    return ret;
 }

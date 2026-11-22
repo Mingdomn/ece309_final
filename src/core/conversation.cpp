@@ -1,6 +1,8 @@
 #include <string>
 #include <cstddef>
 
+#include <cmath>
+
 #include <core/conversation.h>
 
 Conversation::Conversation() : size_(0), capacity_(1) {
