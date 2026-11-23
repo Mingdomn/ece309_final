@@ -340,7 +340,7 @@ TEST(bst_duplicate_insert) {
 
     for (std::uint64_t id : {50, 30, 70, 60, 80, 75}) REQUIRE(t.insert(MemoryRecord{id, "m" + std::to_string(id)}));
 
-    /* Does not matter what the value is, should be rejected. */
+    /* Should be rejected. */
     CHECK(!t.insert(MemoryRecord{30, ""}));
 }
 
@@ -838,12 +838,12 @@ TEST(index_profile) {
 	}
     
         /* Average across searches. */
-        my_search /= words.size();
+        my_search /= 6;
 
         std::printf("%s: my_search: %fms (size = %zu)\n", __func__, my_search, size);
 
         /* Average across searches. */
-        linear_time /= words.size();
+        linear_time /= 6;
 
         std::printf("%s: linear_search: %fms (size = %zu)\n", __func__, linear_time, size);
     }

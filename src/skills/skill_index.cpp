@@ -75,6 +75,7 @@ std::vector<std::size_t> SkillIndex::search(std::string_view query, std::size_t 
 
 bool SkillIndex::compare::operator()(const std::pair<std::size_t, std::size_t> &lhs,
     const std::pair<std::size_t, std::size_t> &rhs) const {
+    /* Check query words first, then doc id. */
     if (lhs.second < rhs.second)
 	    return true;
     else if (lhs.second > rhs.second)
