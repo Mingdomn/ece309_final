@@ -20,15 +20,16 @@ push\_front(), replacing head. So n2's next points to n1, and n2's prev
 is null. The new order is n2 -> n1 -> n3.
 
 A call to put() is forced to evict when the key is not already cached,
-and map\_.size() is larger than capacity\_. In such a case, we first
-check if the cache is empty (which is possible when capacity_ = 0); If
-it is, the function returns early and nothing is done. Otherwise, the
-tail is passed to the unlink helper function (where n-\>prev-\>next is
-changed to null, and tail\_ is changed to n-\>prev), and its key is
-removed from map\_, and the evictions statistic is incremented. Next,
-instead of freeing the node, it's used to host the new entry's key value
-pair. The new key value pair is inserted into map\_, and the node gets
-passed to the push\_front() helper.
+and map\_.size() is larger than or equal to capacity\_. In such a case,
+we first check if the cache is empty (which is possible when
+capacity_ = 0); If it is, the function returns early and nothing is
+done. Otherwise, the tail is passed to the unlink helper function
+(where n-\>prev-\>next is changed to null, and tail\_ is changed to
+n-\>prev), and its key is removed from map\_, and the evictions
+statistic is incremented. Next, instead of freeing the node, it's used
+to host the new entry's key value pair. The new key value pair is
+inserted into map\_, and the node gets passed to the push\_front()
+helper.
 
 The LRU cache being O(1) largely depends on std::unordered\_map being
 O(1). Looking at the functions one by one, the get() function uses
@@ -119,8 +120,8 @@ the number of documents. The inverted index is, as expected, faster.
 This is because the linear search re-tokenizes every document on every
 query.
 
-The reason the times may be closer than the expected 1,500x improvement
-in the spec is that the number of unique words used was small.
+The reason the times are closer than the expected 1,500x improvement in
+the spec may be that the number of unique words used was small.
 
 ## 6. Threat model
 <!-- 3–5 sentences: what does the default policy chain defend against, and
